@@ -7,7 +7,7 @@ import pluralize from 'pluralize'
 import AddrLink from '../../components/addrlink'
 import Amount from '../../components/amount'
 
-export default function Transaction({ transaction, chain }) {
+export default function Transaction({ transaction, chain, outpoint_transactions }) {
   const txid = id(transaction)
   let block
   let height = chain.length
@@ -38,9 +38,12 @@ export default function Transaction({ transaction, chain }) {
           <strong>None. Coinbase Transaction.</strong>:
           <ol>
             {transaction.inputs.map((input, i: number) =>
-              <li key={i}>Outpoint (
-                <TxLink txid={input.outpoint.txid}/>,{` `}
-                {input.outpoint.index})</li>
+              <li key={i}>
+                Outpoint (
+                  <TxLink txid={input.outpoint.txid}/>,{` `}
+                  {input.outpoint.index}
+                ) owned by <AddrLink addr={outpoint_transactions[i]}/>
+              </li>
             )}
           </ol>
         }</li>
@@ -72,5 +75,10 @@ export async function getServerSideProps(context) {
   const transaction = await getObject('transaction', context.params.id)
   const chain = await getChain()
 
-  return { props: { transaction, chain } }
+  const outpoint_promises = transaction.inputs?.map(async (input) => {
+    return (await getObject('transaction', input.outpoint.txid)).outputs[input.outpoint.index].pubkey;
+  })
+  const outpoint_transactions = typeof outpoint_promises === 'undefined' ? [] : await Promise.all(outpoint_promises)
+
+  return { props: { transaction, chain, outpoint_transactions } }
 }

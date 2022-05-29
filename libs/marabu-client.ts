@@ -39,6 +39,19 @@ type Block = any
 type Transaction = any
 type blockDict = {[key: string]: Block}
 
+export async function getAllTxIds(): Promise<string[]> {
+  const chain = await getChain()
+  const allTxIds = []
+
+  for (const block of chain) {
+    for (const txid of block.txids) {
+      allTxIds.push(txid)
+    }
+  }
+
+  return allTxIds;
+}
+
 export async function getAllTxs(): Promise<Transaction[]> {
   const chain = await getChain()
   const allTxIds = []
