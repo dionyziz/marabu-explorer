@@ -36,8 +36,8 @@ export class MessageSocket extends EventEmitter {
       }
     })
   }
-  sendMessage(message: string) {
-    this.netSocket.write(`${message}\n`)
+  sendMessage(message: any) {
+    this.netSocket.write(`${JSON.stringify(message)}\n`)
   }
   end() {
     this.netSocket.end()

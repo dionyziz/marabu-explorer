@@ -1,9 +1,10 @@
 import { id } from '../libs/object'
+import Link from 'next/link'
 
 export default function Chain({ chain }) {
   return (
     <div>
-      The canonical chain has height { chain.length }.<br />
+      <div>The canonical chain has height <strong>{ chain.length - 1 }</strong>.</div>
 
       <table>
         <tr>
@@ -13,9 +14,13 @@ export default function Chain({ chain }) {
         </tr>
       {chain.map((block, i) =>
         (
-          <tr>
+          <tr key={i}>
             <td>{chain.length - 1 - i}</td>
-            <td>{id(block)}</td>
+            <td>
+              <Link href={`/block/${id(block)}`}>
+                <a>{id(block)}</a>
+              </Link>
+            </td>
             <td>{block.miner}</td>
           </tr>
         )

@@ -4,24 +4,47 @@ import { id } from './object'
 const FULLNODE_HOST = 'localhost'
 const FULLNODE_PORT = 18018
 
+export async function getBlock(blockid: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const client = getClient()
+
+    client.sendMessage({
+      type: 'getobject',
+      objectid: blockid
+    })
+
+    client.on('message', (messageStr: string) => {
+      const message = JSON.parse(messageStr)
+
+      if (message.type === 'object' && message.object.type === 'block') {
+        resolve(message.object)
+      }
+    })
+  })
+}
+
+export function getClient() {
+  const client = MessageSocket.createClient(`${FULLNODE_HOST}:${FULLNODE_PORT}`)
+
+  client.sendMessage({
+    type: 'hello',
+    agent: 'Marabu Explorer 0.1.0',
+    version: '0.8.0'
+  })
+
+  return client
+}
+
 export async function getChain(): Promise<any[]> {
   return new Promise((resolve, reject) => {
     const blocks = {}
-    const client = MessageSocket.createClient(`${FULLNODE_HOST}:${FULLNODE_PORT}`)
+    const client = getClient()
     let tip
 
-    function send(message) {
-      client.sendMessage(JSON.stringify(message))
-    }
     client.netSocket.on('error', (e) => {
       reject(e)
     })
-    send({
-      type: 'hello',
-      agent: 'Marabu Explorer 0.1.0',
-      version: '0.8.0'
-    })
-    send({
+    client.sendMessage({
       type: 'getchaintip'
     })
     client.on('message', (messageStr: string) => {
@@ -31,7 +54,7 @@ export async function getChain(): Promise<any[]> {
         tip = message.blockid
         console.log(`Tip is: ${tip}`)
 
-        send({
+        client.sendMessage({
           type: 'getobject',
           objectid: message.blockid
         })
@@ -54,7 +77,7 @@ export async function getChain(): Promise<any[]> {
           resolve(chain)
         }
         else {
-          send({
+          client.sendMessage({
             type: 'getobject',
             objectid: message.object.previd
           })
