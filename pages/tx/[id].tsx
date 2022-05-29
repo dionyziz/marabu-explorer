@@ -36,17 +36,19 @@ export default function Transaction({ transaction, chain }) {
         <li><strong>{transaction.inputs?.length} Inputs</strong>: {
           transaction.height ?
           <strong>None. Coinbase Transaction.</strong>:
-          transaction.inputs.map((input, i: number) =>
-            <span key={i}>Outpoint (
-              <TxLink txid={input.txid}/>,
-              ${input.index})</span>
-          )
+          <ol>
+            {transaction.inputs.map((input, i: number) =>
+              <li key={i}>Outpoint (
+                <TxLink txid={input.outpoint.txid}/>,{` `}
+                {input.outpoint.index})</li>
+            )}
+          </ol>
         }</li>
         <li><strong>{pluralize('Output', transaction.outputs.length, true)}</strong>:
           <ol>
             {
               transaction.outputs.map((output, i: number) =>
-                <li key={i}>Output paying <AddrLink addr={output.pubkey} /> the amount of <Amount amount={output.value} /> bu</li>
+                <li key={i}>Output paying <AddrLink addr={output.pubkey} /> the amount of <Amount amount={output.value} /></li>
               )
             }
           </ol>

@@ -1,5 +1,4 @@
 import Layout from '../../components/layout'
-import Link from 'next/link'
 import { getObject } from '../../libs/marabu-client'
 import { id } from '../../libs/object'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -34,9 +33,15 @@ export default function Block({ block }) {
         </li>
         <li>
           <strong>{block.txids.length} transactions</strong>:{` `}
-          {block.txids.map((txid: string) =>
-            (<TxLink txid={txid} />))
-          }
+          <ol>
+            {block.txids.map((txid: string) =>
+              (
+                <li>
+                  <TxLink txid={txid} />
+                </li>
+              ))
+            }
+          </ol>
         </li>
       </ul>
     </Layout>
