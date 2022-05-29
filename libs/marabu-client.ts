@@ -4,19 +4,19 @@ import { id } from './object'
 const FULLNODE_HOST = 'localhost'
 const FULLNODE_PORT = 18018
 
-export async function getBlock(blockid: string): Promise<any> {
+export async function getObject(type: string, objectid: string): Promise<any> {
   return new Promise((resolve, reject) => {
     const client = getClient()
 
     client.sendMessage({
       type: 'getobject',
-      objectid: blockid
+      objectid
     })
 
     client.on('message', (messageStr: string) => {
       const message = JSON.parse(messageStr)
 
-      if (message.type === 'object' && message.object.type === 'block') {
+      if (message.type === 'object' && message.object.type === type) {
         resolve(message.object)
       }
     })
