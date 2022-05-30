@@ -5,12 +5,12 @@ import { getChain } from '../libs/marabu-client'
 export default function Home({ chain, error }) {
   return (
     <Layout>
-      <p className="description">
+      <div className="description">
         {
           error? `Error accessing Marabu full node: ${error}`:
           <Chain chain={chain} />
         }
-      </p>
+      </div>
     </Layout>
   )
 }

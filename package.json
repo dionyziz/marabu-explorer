@@ -1,9 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3921",
     "build": "next build",
-    "start": "next start"
+    "start": "next start -p 3921"
   },
   "dependencies": {
     "dayjs": "^1.11.2",

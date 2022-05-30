@@ -11,6 +11,15 @@ function ShortBlock({ block, chainLength, i }) {
   newDate.setTime(block.created*1000)
   const dateString = newDate.toUTCString()
 
+  let diff
+
+  try {
+    diff = dayjs.unix(block.created).fromNow()
+  }
+  catch (e) {
+    diff = ''
+  }
+
   return (
     <tr>
       <td>{chainLength - 1 - i}</td>
@@ -18,7 +27,7 @@ function ShortBlock({ block, chainLength, i }) {
         <BlockLink blockid={id(block)} short />
       </td>
       <td>
-        {dayjs.unix(block.created).fromNow()}
+        {diff}
       </td>
       <td>
         {dateString}
