@@ -46,7 +46,7 @@ export default function Chain({ chain }) {
         </tr>
       {chain.map((block, i) =>
         (
-          <ShortBlock block={block} chainLength={chain.length} i={i} />
+          <ShortBlock block={block} chainLength={chain.length} i={i} key={i} />
         )
       )}
       </table>
