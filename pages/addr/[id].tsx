@@ -17,9 +17,9 @@ export default function Address({ addr, incomingAmount, txs }) {
         <strong>{txs.length} transaction outputs</strong>:{` `}
         <ol>
             {
-              txs.map(({txid, index}) => (
+              txs.map(({txid, index, value}) => (
                 <li>
-                  <TxLink txid={txid} />, {index}
+                  (<TxLink txid={txid} />, {index}) worth <Amount amount={value}/>
                 </li>
               ))
             }
@@ -43,6 +43,7 @@ export async function getServerSideProps(context) {
         txs.push({
           txid: allTxIds[i],
           index,
+          value: output.value,
         })
       }
     })
