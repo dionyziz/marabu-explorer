@@ -2,13 +2,13 @@ import Layout from '../components/layout'
 import Chain from '../components/chain'
 import { getChain } from '../libs/marabu-client'
 
-export default function Home({ chain, error }) {
+export default function Home({ chainInfo, error }) {
   return (
     <Layout>
       <div className="description">
         {
           error? `Error accessing Marabu full node: ${error}`:
-          <Chain chain={chain} />
+          <Chain chain={chainInfo.chain} height={chainInfo.chainHeight} />
         }
       </div>
     </Layout>
@@ -16,14 +16,14 @@ export default function Home({ chain, error }) {
 }
 
 export async function getServerSideProps() {
-  let chain = null, error = null
+  let chainInfo = null, error = null
 
   try {
-    chain = await getChain()
+    chainInfo = await getChain()
   }
   catch (e: any) {
     error = e.message
   }
 
-  return { props: { chain, error } }
+  return { props: { chainInfo, error } }
 }
