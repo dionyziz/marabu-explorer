@@ -41,7 +41,7 @@ function ShortBlock({ block, chainLength, i }) {
 export default function Chain({ chain }) {
   return (
     <div>
-      <div>The canonical chain has height <strong>{ chain.length - 1 }</strong>.</div>
+      <div>The canonical chain has unknown height.</div>
       <br />
 
       <table>
