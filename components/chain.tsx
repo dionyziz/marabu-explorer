@@ -22,7 +22,7 @@ function ShortBlock({ block, chainLength, i }) {
 
   return (
     <tr>
-      <td>{chainLength - 1 - i}</td>
+      <td>{-i}</td>
       <td>
         <BlockLink blockid={id(block)} short />
       </td>
@@ -46,7 +46,7 @@ export default function Chain({ chain }) {
 
       <table>
         <tr>
-          <th>Height</th>
+          <th>Relative<br/>Height</th>
           <th>Hash</th>
           <th>Age</th>
           <th>Time</th>
