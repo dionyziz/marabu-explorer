@@ -21,6 +21,7 @@ export default function Block({ block }) {
       <ul>
         <li><strong>Block ID</strong>: {id(block)}</li>
         <li><strong>Target</strong>: {block.T}</li>
+        <li><strong>Nonce</strong>: {block.nonce}</li>
         <li><strong>Miner</strong>: {block.miner}</li>
         <li><strong>Created</strong>: {dayjs.unix(block.created).fromNow()} ({dateString}) at UNIX timestamp {block.created} </li>
         <li><strong>Note</strong>: {block.note}</li>
