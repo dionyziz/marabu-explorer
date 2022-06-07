@@ -42,7 +42,8 @@ export default function Transaction({ transaction, chain, chainHeight, outpoint_
                 Outpoint (
                   <TxLink txid={input.outpoint.txid}/>,{` `}
                   {input.outpoint.index}
-                ) owned by <AddrLink addr={outpoint_transactions[i]}/>
+                ) worth <Amount amount={outpoint_transactions[i].value}/>,
+                  owned by <AddrLink addr={outpoint_transactions[i].pubkey}/>
               </li>
             )}
           </ol>
@@ -76,7 +77,7 @@ export async function getServerSideProps(context) {
   const { chain, chainHeight } = await getChain()
 
   const outpoint_promises = transaction.inputs?.map(async (input) => {
-    return (await getObject('transaction', input.outpoint.txid)).outputs[input.outpoint.index].pubkey;
+    return (await getObject('transaction', input.outpoint.txid)).outputs[input.outpoint.index];
   })
   const outpoint_transactions = typeof outpoint_promises === 'undefined' ? [] : await Promise.all(outpoint_promises)
 
