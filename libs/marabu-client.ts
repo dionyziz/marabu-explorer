@@ -1,8 +1,9 @@
 import { MessageSocket } from './net'
 import { id } from './object'
 
-const FULLNODE_HOST = 'localhost'
+const FULLNODE_HOST = '149.28.220.241'
 const FULLNODE_PORT = 18018
+const CHAIN_LIMIT = 50
 
 export function getClient() {
   const client = MessageSocket.createClient(`${FULLNODE_HOST}:${FULLNODE_PORT}`)
@@ -45,7 +46,7 @@ export async function getAllTxIds(): Promise<string[]> {
 }
 
 export async function getAllTxs(): Promise<Transaction[]> {
-  const chain = await getChain()
+  const { chain } = await getChain()
   const allTxIds = []
   const allTxs = []
   let pendingTxCount
@@ -83,11 +84,13 @@ export async function getAllTxs(): Promise<Transaction[]> {
   })
 }
 
-export async function getAllBlocks(): Promise<{tip: string, blocks: blockDict}> {
+export async function getChain(): Promise<{chain: Block[], chainHeight: number}> {
   return new Promise((resolve, reject) => {
-    const blocks: blockDict = {}
     const client = getClient()
     let tip = null
+    const chain = []
+    let tipCoinbase = null
+    let chainHeight = 0
 
     client.netSocket.on('error', e => reject(e))
     client.sendMessage({
@@ -97,47 +100,49 @@ export async function getAllBlocks(): Promise<{tip: string, blocks: blockDict}> 
       const message = JSON.parse(messageStr)
 
       if (message.type === 'chaintip') {
-        tip = message.blockid
-
-        client.sendMessage({
-          type: 'getobject',
-          objectid: message.blockid
-        })
-      }
-      if (message.type === 'object' && message.object.type === 'block') {
-        console.log(`Block `, message.object)
-        const objectid = id(message.object)
-        blocks[objectid] = message.object
-
-        if (message.object.previd === null) {
-          resolve({
-            tip,
-            blocks
-          })
-        }
-        else {
+        if (!tip) {
+          tip = message.blockid
+          
           client.sendMessage({
             type: 'getobject',
-            objectid: message.object.previd
+            objectid: message.blockid
           })
+        }
+      }
+      if (message.type === 'object' && message.object.type === 'block') {
+        const objectid = id(message.object)
+
+        if ((chain.length ? chain[chain.length - 1].previd : tip) === objectid) {
+          if (chain.length === 0 && message.object.txids.length) {
+            tipCoinbase = message.object.txids[0]
+            // Get coinbase to figure out chain height
+            client.sendMessage({
+              type: 'getobject',
+              objectid: tipCoinbase
+            })
+          }
+
+          chain.push(message.object)
+
+          if (message.object.previd === null) {
+            resolve({chain, chainHeight})
+          }
+          else {
+            if (chain.length >= CHAIN_LIMIT) {
+              resolve({chain, chainHeight})
+              return;
+            }
+            client.sendMessage({
+              type: 'getobject',
+              objectid: message.object.previd
+            })
+          }
+        }
+      } else if (message.type === 'object' && message.object.type === 'transaction') {
+        if (id(message.object) === tipCoinbase && message.object.height) {
+          chainHeight = message.object.height;
         }
       }
     })
   })
-}
-
-export async function getChain(): Promise<Block[]> {
-  const {tip, blocks} = await getAllBlocks()
-  const chain = []
-
-  let block = blocks[tip]
-
-  while (block.previd !== null) {
-    chain.push(block)
-    console.log(`Looking up: ${block.previd}`)
-    block = blocks[block.previd]
-  }
-  chain.push(block)
-
-  return chain
 }

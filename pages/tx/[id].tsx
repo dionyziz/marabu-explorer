@@ -7,10 +7,10 @@ import pluralize from 'pluralize'
 import AddrLink from '../../components/addrlink'
 import Amount from '../../components/amount'
 
-export default function Transaction({ transaction, chain, outpoint_transactions }) {
+export default function Transaction({ transaction, chain, chainHeight, outpoint_transactions }) {
   const txid = id(transaction)
   let block
-  let height = chain.length
+  let height = chainHeight
   let confirmations = 0
 
   for (const chainBlock of chain) {
@@ -74,12 +74,12 @@ export default function Transaction({ transaction, chain, outpoint_transactions 
 
 export async function getServerSideProps(context) {
   const transaction = await getObject('transaction', context.params.id)
-  const chain = await getChain()
+  const { chain, chainHeight } = await getChain()
 
   const outpoint_promises = transaction.inputs?.map(async (input) => {
     return (await getObject('transaction', input.outpoint.txid)).outputs[input.outpoint.index];
   })
   const outpoint_transactions = typeof outpoint_promises === 'undefined' ? [] : await Promise.all(outpoint_promises)
 
-  return { props: { transaction, chain, outpoint_transactions } }
+  return { props: { transaction, chain, chainHeight, outpoint_transactions } }
 }

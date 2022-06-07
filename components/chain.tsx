@@ -6,7 +6,7 @@ import BlockLink from './blocklink'
 
 dayjs.extend(relativeTime)
 
-function ShortBlock({ block, chainLength, i }) {
+function ShortBlock({ block, height, i }) {
   const newDate = new Date()
   newDate.setTime(block.created*1000)
   const dateString = newDate.toUTCString()
@@ -22,7 +22,7 @@ function ShortBlock({ block, chainLength, i }) {
 
   return (
     <tr>
-      <td>{chainLength - 1 - i}</td>
+      <td>{height - i}</td>
       <td>
         <BlockLink blockid={id(block)} short />
       </td>
@@ -38,10 +38,10 @@ function ShortBlock({ block, chainLength, i }) {
   )
 }
 
-export default function Chain({ chain }) {
+export default function Chain({ chain, height }) {
   return (
     <div>
-      <div>The canonical chain has height <strong>{ chain.length - 1 }</strong>.</div>
+      <div>The canonical chain has height <strong>{ height }</strong>.</div>
       <br />
 
       <table>
@@ -55,7 +55,7 @@ export default function Chain({ chain }) {
         </tr>
       {chain.map((block, i) =>
         (
-          <ShortBlock block={block} chainLength={chain.length} i={i} key={i} />
+          <ShortBlock block={block} height={height} i={i} key={i} />
         )
       )}
       </table>
